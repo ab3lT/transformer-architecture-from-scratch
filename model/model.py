@@ -175,3 +175,16 @@ class DecoderBlock(nn.Module):
         x = self.residual_connection[1](x, lambda x: self.cross_attention_block(x, enc_output, enc_output, src_mask))
         x = self.residual_connection[2](x, self.feed_forward_block)
         return x
+    
+class Decoder(nn.Module):
+    
+    def __init__(self, layers: nn.ModuleList) -> None:
+        super().__init__()
+        self.layers = layers
+        self.norm = LayerNormalization()
+        
+    def forward(self, x, enc_output, src_mask, tgt_mask):
+        for layer in self.layers:
+            x = layer(x, enc_output, src_mask, tgt_mask)
+        return self.norm(x)
+        
